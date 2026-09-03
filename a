@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>毒親選手権</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #0b0b0d;
+    color: white;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Hiragino Kaku Gothic ProN",
+        "Yu Gothic",
+        sans-serif;
+
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game {
+    width: 90%;
+    max-width: 700px;
+}
+
+/* 画面 */
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* ボックス */
+
+.box {
+    background: #151519;
+
+    border: 1px solid #333;
+
+    border-radius: 15px;
+
+    padding: 40px 30px;
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,0.5);
+}
+
+/* タイトル */
+
+.title {
+    font-size: 60px;
+
+    text-align: center;
+
+    letter-spacing: 10px;
+
+    margin-bottom: 20px;
+}
+
+.description {
+    text-align: center;
+
+    color: #999;
+
+    line-height: 1.8;
+
+    margin-bottom: 35px;
+}
+
+/* 名前入力 */
+
+input {
+    width: 100%;
+
+    padding: 17px;
+
+    background: #0c0c0f;
+
+    border: 1px solid #555;
+
+    border-radius: 8px;
+
+    color: white;
+
+    font-size: 18px;
+
+    outline: none;
+
+    margin-bottom: 15px;
+}
+
+/* ボタン */
+
+button {
+    width: 100%;
+
+    padding: 17px;
+
+    border-radius: 8px;
+
+    border: 1px solid #555;
+
+    background: #242428;
+
+    color: white;
+
+    font-size: 18px;
+
+    cursor: pointer;
+}
+
+button:hover {
+    background: #333;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* 質問 */
+
+.question-number {
+    color: #777;
+
+    font-size: 14px;
+
+    margin-bottom: 20px;
+}
+
+.question {
+    font-size: 28px;
+
+    line-height: 1.6;
+
+    margin-bottom: 30px;
+}
+
+/* 回答 */
+
+.answers {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+/* プログレス */
+
+.progress {
+    width: 100%;
+
+    height: 3px;
+
+    background: #29292d;
+
+    margin-bottom: 30px;
+}
+
+.progress-bar {
+    height: 100%;
+
+    background: white;
+
+    width: 0%;
+
+    transition: width 0.3s;
+}
+
+/* 結果 */
+
+.result-name {
+    color: #999;
+
+    text-align: center;
+}
+
+.score {
+    font-size: 80px;
+
+    font-weight: bold;
+
+    text-align: center;
+
+    margin-top: 10px;
+}
+
+.point-text {
+    text-align: center;
+
+    color: #777;
+
+    letter-spacing: 5px;
+}
+
+.rank {
+    text-align: center;
+
+    margin: 30px 0;
+
+    font-size: 20px;
+}
+
+.rank-number {
+    font-size: 45px;
+
+    font-weight: bold;
+}
+
+/* 注意書き */
+
+.note {
+    color: #666;
+
+    font-size: 12px;
+
+    line-height: 1.7;
+
+    text-align: center;
+
+    margin-top: 25px;
+}
+</style>
+</head>
+
+
+<body>
+
+<div id="game">
+
+
+<!-- ========================= -->
+<!-- タイトル画面 -->
+<!-- ========================= -->
+
+<div id="titleScreen" class="screen active">
+
+    <div class="box">
+
+        <div class="title">
+            毒親選手権
+        </div>
+
+        <div class="description">
+
+            あなたの家庭環境は、何点？<br>
+
+            11個の質問に正直に答えてください。
+
+        </div>
+
+
+        <input
+            id="nameInput"
+            type="text"
+            maxlength="20"
+            placeholder="名前を入力してください"
+        >
+
+
+        <button onclick="startGame()">
+
+            選手権に参加する
+
+        </button>
+
+
+        <div class="note">
+
+            ※このゲームは娯楽目的のスコアリングです。<br>
+            実際の家庭環境や「毒親」を医学的・法的に判定するものではありません。
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ========================= -->
+<!-- 質問画面 -->
+<!-- ========================= -->
+
+<div id="questionScreen" class="screen">
+
+    <div class="box">
+
+
+        <div class="progress">
+
+            <div
+                id="progressBar"
+                class="progress-bar">
+            </div>
+
+        </div>
+
+
+        <div
+            id="questionNumber"
+            class="question-number">
+        </div>
+
+
+        <div
+            id="questionText"
+            class="question">
+        </div>
+
+
+        <div
+            id="answers"
+            class="answers">
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- ========================= -->
+<!-- 結果画面 -->
+<!-- ========================= -->
+
+<div id="resultScreen" class="screen">
+
+    <div class="box">
+
+        <div
+            id="resultName"
+            class="result-name">
+        </div>
+
+
+        <div
+            id="score"
+            class="score">
+        </div>
+
+
+        <div class="point-text">
+            POINT
+        </div>
+
+
+        <div class="rank">
+
+            あなたは暫定
+
+            <span
+                id="rankNumber"
+                class="rank-number">
+            </span>
+
+            位
+
+        </div>
+
+
+        <button onclick="showRanking()">
+
+            ランキングを見る
+
+        </button>
+
+
+        <br><br>
+
+
+        <button onclick="location.reload()">
+
+            もう一度挑戦する
+
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- ========================= -->
+<!-- ランキング -->
+<!-- ========================= -->
+
+<div id="rankingScreen" class="screen">
+
+    <div class="box">
+
+        <h2 style="text-align:center">
+            暫定ランキング
+        </h2>
+
+
+        <div id="rankingList"></div>
+
+
+        <br>
+
+
+        <button onclick="location.reload()">
+
+            タイトルへ戻る
+
+        </button>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+/*
+==================================================
+質問データ
+==================================================
+
+「p」が内部的な配点。
+
+プレイヤー画面には表示されません。
+==================================================
+*/
+
+
+const questions = [
+
+    {
+        question: "親が奇数である",
+
+        answers: [
+            "はい",
+            "いいえ"
+        ],
+
+        points: [
+            3,
+            0
+        ]
+    },
+
+
+    {
+        question: "親に殴られた事がある",
+
+        answers: [
+            "はい",
+            "いいえ"
+        ],
+
+        points: [
+            2,
+            0
+        ]
+    },
+
+
+    {
+        question: "親に強い嫌悪感を抱いた事がある",
+
+        answers: [
+            "はい",
+            "いいえ"
+        ],
+
+        points: [
+            2,
+            0
+        ]
+    },
+
+
+    {
+        question: "親の顔色を伺って生きていた",
+
+        answers: [
+            "はい",
+            "いいえ"
+        ],
+
+        points: [
+            1,
+            0
+        ]
+    },
+
+
+    {
+        question: "親の私情で進路を制限、決められた",
+
+        answers: [
+            "はい",
+            "いいえ"
+        ],
+
+        points: [
+            1,
+            0
+        ]
+    },
+
+
+    {
+        question: "親によく悪口を言われた",
+
+        answers: [
+            "はい",
+            "いいえ"
+        ],
+
+        points: [
+            2,
+            0
+        ]
+    },
+
+
+    {
+        question: "親は過干渉だった",
+
+        answers: [
+            "はい",
+            "いいえ"
+        ],
+
+        points: [
+            1,
+            0
+        ]
+    },
+
+
+    {
+        question: "親はご飯を作ってくれた・食べさせてくれた",
+
+        answers: [
+            "はい",
+            "部分的にそう",
+            "いいえ"
+        ],
+
+        points: [
+            0,
+            1,
+            2
+        ]
+    },
+
+
+    {
+        question: "親とよく会話をする",
+
+        answers: [
+            "はい",
+            "部分的にそう",
+            "いいえ"
+        ],
+
+        points: [
+            0,
+            1,
+            2
+        ]
+    },
+
+
+    {
+        question: "親との関係は良好だ",
+
+        answers: [
+            "はい",
+            "いいえ"
+        ],
+
+        points: [
+            1,
+            0
+        ]
+    },
+
+
+    {
+        question: "親の事は好きだ",
+
+        answers: [
+            "はい",
+            "分からない",
+            "いいえ"
+        ],
+
+        points: [
+            -5,
+            0,
+            5
+        ]
+    }
+
+];
+
+
+
+/*
+==================================================
+ゲーム変数
+==================================================
+*/
+
+
+let playerName = "";
+
+let currentQuestion = 0;
+
+let totalScore = 0;
+
+
+
+/*
+==================================================
+画面切り替え
+==================================================
+*/
+
+
+function changeScreen(screenId) {
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(screen => {
+
+            screen.classList.remove("active");
+
+        });
+
+
+    document
+        .getElementById(screenId)
+        .classList.add("active");
+
+}
+
+
+
+/*
+==================================================
+ゲーム開始
+==================================================
+*/
+
+
+function startGame() {
+
+    const input =
+        document.getElementById("nameInput");
+
+    const name =
+        input.value.trim();
+
+
+    if (name === "") {
+
+        alert("名前を入力してください。");
+
+        return;
+
+    }
+
+
+    playerName = name;
+
+    currentQuestion = 0;
+
+    totalScore = 0;
+
+
+    changeScreen("questionScreen");
+
+
+    showQuestion();
+
+}
+
+
+
+/*
+==================================================
+質問表示
+==================================================
+*/
+
+
+function showQuestion() {
+
+    const data =
+        questions[currentQuestion];
+
+
+    document
+        .getElementById("questionNumber")
+        .textContent =
+        "QUESTION " +
+        (currentQuestion + 1) +
+        " / " +
+        questions.length;
+
+
+    document
+        .getElementById("questionText")
+        .textContent =
+        data.question;
+
+
+    /*
+    プログレスバー
+    */
+
+    const progress =
+        (currentQuestion / questions.length) * 100;
+
+
+    document
+        .getElementById("progressBar")
+        .style.width =
+        progress + "%";
+
+
+    /*
+    回答ボタン生成
+    */
+
+    const answers =
+        document.getElementById("answers");
+
+
+    answers.innerHTML = "";
+
+
+    data.answers.forEach(
+        (answer, index) => {
+
+
+            const button =
+                document.createElement("button");
+
+
+            button.textContent =
+                answer;
+
+
+            button.onclick =
+                function() {
+
+                    answerQuestion(index);
+
+                };
+
+
+            answers.appendChild(button);
+
+        }
+    );
+
+}
+
+
+
+/*
+==================================================
+回答処理
+==================================================
+*/
+
+
+function answerQuestion(answerIndex) {
+
+    const data =
+        questions[currentQuestion];
+
+
+    /*
+    ここで内部的に加点。
+
+    プレイヤーには表示しない。
+    */
+
+    totalScore +=
+        data.points[answerIndex];
+
+
+    currentQuestion++;
+
+
+    if (
+        currentQuestion >=
+        questions.length
+    ) {
+
+        finishGame();
+
+    }
+
+    else {
+
+        showQuestion();
+
+    }
+
+}
+
+
+
+/*
+==================================================
+ゲーム終了
+==================================================
+*/
+
+
+function finishGame() {
+
+    /*
+    プログレス100%
+    */
+
+    document
+        .getElementById("progressBar")
+        .style.width = "100%";
+
+
+    /*
+    結果画面
+    */
+
+    document
+        .getElementById("resultName")
+        .textContent =
+        playerName + " さんの結果";
+
+
+    document
+        .getElementById("score")
+        .textContent =
+        totalScore;
+
+
+    saveRanking();
+
+
+    const rank =
+        getPlayerRank();
+
+
+    document
+        .getElementById("rankNumber")
+        .textContent =
+        rank;
+
+
+    changeScreen("resultScreen");
+
+}
+
+
+
+/*
+==================================================
+ランキング保存
+==================================================
+*/
+
+
+function getRanking() {
+
+    const data =
+        localStorage.getItem(
+            "dokuoya_ranking"
+        );
+
+
+    if (!data) {
+
+        return [];
+
+    }
+
+
+    try {
+
+        return JSON.parse(data);
+
+    }
+
+    catch {
+
+        return [];
+
+    }
+
+}
+
+
+
+/*
+==================================================
+スコア保存
+==================================================
+*/
+
+
+function saveRanking() {
+
+    let ranking =
+        getRanking();
+
+
+    ranking.push({
+
+        name: playerName,
+
+        score: totalScore
+
+    });
+
+
+    /*
+    点数が高い順
+    */
+
+    ranking.sort(
+        (a, b) =>
+            b.score - a.score
+    );
+
+
+    /*
+    最大100人まで
+    */
+
+    ranking =
+        ranking.slice(0, 100);
+
+
+    localStorage.setItem(
+
+        "dokuoya_ranking",
+
+        JSON.stringify(ranking)
+
+    );
+
+}
+
+
+
+/*
+==================================================
+自分の順位
+==================================================
+*/
+
+
+function getPlayerRank() {
+
+    const ranking =
+        getRanking();
+
+
+    for (
+        let i = 0;
+        i < ranking.length;
+        i++
+    ) {
+
+        if (
+            ranking[i].name === playerName &&
+            ranking[i].score === totalScore
+        ) {
+
+            return i + 1;
+
+        }
+
+    }
+
+
+    return ranking.length;
+
+}
+
+
+
+/*
+==================================================
+ランキング表示
+==================================================
+*/
+
+
+function showRanking() {
+
+    changeScreen("rankingScreen");
+
+
+    const ranking =
+        getRanking();
+
+
+    const container =
+        document.getElementById(
+            "rankingList"
+        );
+
+
+    container.innerHTML = "";
+
+
+    /*
+    表形式ではなく、
+    シンプルなランキングを生成
+    */
+
+    ranking
+        .slice(0, 20)
+        .forEach(
+            (player, index) => {
+
+
+                const row =
+                    document.createElement("div");
+
+
+                row.style.display =
+                    "flex";
+
+
+                row.style.justifyContent =
+                    "space-between";
+
+
+                row.style.padding =
+                    "14px 5px";
+
+
+                row.style.borderBottom =
+                    "1px solid #333";
+
+
+                row.innerHTML =
+
+                    "<span>" +
+                    (index + 1) +
+                    "位　" +
+                    escapeHTML(player.name) +
+                    "</span>" +
+
+                    "<span>" +
+                    player.score +
+                    " POINT" +
+                    "</span>";
+
+
+                container.appendChild(row);
+
+            }
+        );
+
+}
+
+
+
+/*
+==================================================
+HTMLエスケープ
+==================================================
+*/
+
+
+function escapeHTML(text) {
+
+    return text.replace(
+        /[&<>"']/g,
+
+        function(character) {
+
+            const map = {
+
+                "&": "&amp;",
+
+                "<": "&lt;",
+
+                ">": "&gt;",
+
+                '"': "&quot;",
+
+                "'": "&#039;"
+
+            };
+
+
+            return map[character];
+
+        }
+    );
+
+}
+
+</script>
+
+</body>
+</html>
