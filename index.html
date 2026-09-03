@@ -921,12 +921,6 @@ async function getRanking() {
 }
 
 
-/*
-==================================================
-スコア保存
-==================================================
-*/
-
 async function saveRanking() {
 
     const client = getSupabase();
@@ -948,12 +942,6 @@ async function saveRanking() {
 }
 
 
-/*
-==================================================
-自分の順位
-==================================================
-*/
-
 async function getPlayerRank() {
 
     const ranking = await getRanking();
@@ -968,7 +956,7 @@ async function getPlayerRank() {
         ? index + 1
         : ranking.length + 1;
 }
-
+    
 async function showRanking() {
 
     changeScreen("rankingScreen");
