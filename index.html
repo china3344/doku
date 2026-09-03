@@ -437,6 +437,25 @@ button:active {
 const SUPABASE_URL = "https://jngkstbfmgxmjrvuivju.supabase.co";
 const SUPABASE_KEY = "sb_publishable_apu59GNhrS-CZ9YXY6f1SQ_4UGqmfy3";
 
+    // ================================
+// 音声
+// ================================
+
+const bgm = new Audio("bgm.mp3");
+const seAnswer = new Audio("se_answer.mp3");
+const seResult = new Audio("se_result.mp3");
+
+// BGMをループ
+bgm.loop = true;
+
+// BGMの音量
+bgm.volume = 0.35;
+
+// SEの音量
+seAnswer.volume = 0.6;
+seResult.volume = 0.7;
+
+
 let supabaseClient = null;
 
 function getSupabase() {
@@ -716,6 +735,40 @@ function startGame() {
     totalScore = 0;
 
 
+    // BGM開始
+    bgm.currentTime = 0;
+    bgm.play().catch(error => {
+        console.log("BGM再生エラー:", error);
+    });
+
+
+    changeScreen("questionScreen");
+
+
+    showQuestion();
+
+}
+
+    const name =
+        input.value.trim();
+
+
+    if (name === "") {
+
+        alert("名前を入力してください。");
+
+        return;
+
+    }
+
+
+    playerName = name;
+
+    currentQuestion = 0;
+
+    totalScore = 0;
+
+
     changeScreen("questionScreen");
 
 
@@ -818,6 +871,44 @@ function answerQuestion(answerIndex) {
 
     const data =
         questions[currentQuestion];
+
+
+    // 回答SE
+    seAnswer.currentTime = 0;
+    seAnswer.play().catch(error => {
+        console.log("SE再生エラー:", error);
+    });
+
+
+    /*
+    ここで内部的に加点。
+
+    プレイヤーには表示しない。
+    */
+
+    totalScore +=
+        data.points[answerIndex];
+
+
+    currentQuestion++;
+
+
+    if (
+        currentQuestion >=
+        questions.length
+    ) {
+
+        finishGame();
+
+    }
+
+    else {
+
+        showQuestion();
+
+    }
+
+}
 
 
     /*
