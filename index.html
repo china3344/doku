@@ -437,7 +437,17 @@ button:active {
 const SUPABASE_URL = "https://jngkstbfmgxmjrvuivju.supabase.co";
 const SUPABASE_KEY = "sb_publishable_apu59GNhrS-CZ9YXY6f1SQ_4UGqmfy3";
 
+let supabaseClient = null;
 
+function getSupabase() {
+    if (!supabaseClient) {
+        supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+    }
+    return supabaseClient;
+}
 
 /*
 ==================================================
