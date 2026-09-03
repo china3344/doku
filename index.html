@@ -715,18 +715,7 @@ function startGame() {
     const input =
         document.getElementById("nameInput");
 
-    const name =
-        input.value.trim();
-
-
-    if (name === "") {
-
-        alert("名前を入力してください。");
-
-        return;
-
-    }
-
+    
 
     playerName = name;
 
@@ -911,36 +900,7 @@ function answerQuestion(answerIndex) {
 }
 
 
-    /*
-    ここで内部的に加点。
-
-    プレイヤーには表示しない。
-    */
-
-    totalScore +=
-        data.points[answerIndex];
-
-
-    currentQuestion++;
-
-
-    if (
-        currentQuestion >=
-        questions.length
-    ) {
-
-        finishGame();
-
-    }
-
-    else {
-
-        showQuestion();
-
-    }
-
-}
-
+   
 
 
 /*
