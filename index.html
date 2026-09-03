@@ -852,48 +852,32 @@ function answerQuestion(answerIndex) {
 */
 
 
-function finishGame() {
-
-    /*
-    プログレス100%
-    */
+async function finishGame() {
 
     document
         .getElementById("progressBar")
         .style.width = "100%";
-
-
-    /*
-    結果画面
-    */
 
     document
         .getElementById("resultName")
         .textContent =
         playerName + " さんの結果";
 
-
     document
         .getElementById("score")
         .textContent =
         totalScore;
 
+    await saveRanking();
 
-    saveRanking();
-
-
-    const rank =
-        getPlayerRank();
-
+    const rank = await getPlayerRank();
 
     document
         .getElementById("rankNumber")
         .textContent =
         rank;
 
-
     changeScreen("resultScreen");
-
 }
 
 
@@ -905,19 +889,21 @@ function finishGame() {
 */
 
 
-function getRanking() {
+async function getRanking() {
 
-    const data =
-        localStorage.getItem(
-            "dokuoya_ranking"
-        );
+    const { data, error } = await supabase
+        .from("ranking")
+        .select("id, name, score, created_at")
+        .order("score", { ascending: false })
+        .limit(100);
 
-
-    if (!data) {
-
+    if (error) {
+        console.error("ランキング取得エラー:", error);
         return [];
-
     }
+
+    return data || [];
+}
 
 
     try {
@@ -943,19 +929,23 @@ function getRanking() {
 */
 
 
-function saveRanking() {
+async function saveRanking() {
 
-    let ranking =
-        getRanking();
+    const { error } = await supabase
+        .from("ranking")
+        .insert({
+            name: playerName,
+            score: totalScore
+        });
 
+    if (error) {
+        console.error("ランキング保存エラー:", error);
+        alert("ランキングの保存に失敗しました。");
+        return false;
+    }
 
-    ranking.push({
-
-        name: playerName,
-
-        score: totalScore
-
-    });
+    return true;
+});
 
 
     /*
@@ -995,28 +985,18 @@ function saveRanking() {
 */
 
 
-function getPlayerRank() {
+async function getPlayerRank() {
 
-    const ranking =
-        getRanking();
+    const ranking = await getRanking();
 
+    const index = ranking.findIndex(
+        player =>
+            player.name === playerName &&
+            player.score === totalScore
+    );
 
-    for (
-        let i = 0;
-        i < ranking.length;
-        i++
-    ) {
-
-        if (
-            ranking[i].name === playerName &&
-            ranking[i].score === totalScore
-        ) {
-
-            return i + 1;
-
-        }
-
-    }
+    return index >= 0 ? index + 1 : ranking.length + 1;
+}
 
 
     return ranking.length;
@@ -1032,74 +1012,51 @@ function getPlayerRank() {
 */
 
 
-function showRanking() {
+async function showRanking() {
 
     changeScreen("rankingScreen");
 
-
-    const ranking =
-        getRanking();
-
-
     const container =
-        document.getElementById(
-            "rankingList"
-        );
+        document.getElementById("rankingList");
 
+    container.innerHTML = "読み込み中...";
+
+    const ranking = await getRanking();
 
     container.innerHTML = "";
 
-
-    /*
-    表形式ではなく、
-    シンプルなランキングを生成
-    */
+    if (ranking.length === 0) {
+        container.textContent =
+            "まだランキングがありません。";
+        return;
+    }
 
     ranking
         .slice(0, 20)
-        .forEach(
-            (player, index) => {
+        .forEach((player, index) => {
 
+            const row =
+                document.createElement("div");
 
-                const row =
-                    document.createElement("div");
+            row.style.display = "flex";
+            row.style.justifyContent = "space-between";
+            row.style.padding = "14px 5px";
+            row.style.borderBottom = "1px solid #333";
 
+            row.innerHTML =
+                "<span>" +
+                (index + 1) +
+                "位　" +
+                escapeHTML(player.name) +
+                "</span>" +
 
-                row.style.display =
-                    "flex";
+                "<span>" +
+                player.score +
+                " POINT" +
+                "</span>";
 
-
-                row.style.justifyContent =
-                    "space-between";
-
-
-                row.style.padding =
-                    "14px 5px";
-
-
-                row.style.borderBottom =
-                    "1px solid #333";
-
-
-                row.innerHTML =
-
-                    "<span>" +
-                    (index + 1) +
-                    "位　" +
-                    escapeHTML(player.name) +
-                    "</span>" +
-
-                    "<span>" +
-                    player.score +
-                    " POINT" +
-                    "</span>";
-
-
-                container.appendChild(row);
-
-            }
-        );
-
+            container.appendChild(row);
+        });
 }
 
 
