@@ -896,9 +896,17 @@ async function finishGame() {
 */
 
 
+/*
+==================================================
+ランキング保存・取得
+==================================================
+*/
+
 async function getRanking() {
 
-    const { data, error } = await supabase
+    const client = getSupabase();
+
+    const { data, error } = await client
         .from("ranking")
         .select("id, name, score, created_at")
         .order("score", { ascending: false })
@@ -913,32 +921,17 @@ async function getRanking() {
 }
 
 
-    try {
-
-        return JSON.parse(data);
-
-    }
-
-    catch {
-
-        return [];
-
-    }
-
-}
-
-
-
 /*
 ==================================================
 スコア保存
 ==================================================
 */
 
-
 async function saveRanking() {
 
-    const { error } = await supabase
+    const client = getSupabase();
+
+    const { error } = await client
         .from("ranking")
         .insert({
             name: playerName,
@@ -952,37 +945,7 @@ async function saveRanking() {
     }
 
     return true;
-});
-
-
-    /*
-    点数が高い順
-    */
-
-    ranking.sort(
-        (a, b) =>
-            b.score - a.score
-    );
-
-
-    /*
-    最大100人まで
-    */
-
-    ranking =
-        ranking.slice(0, 100);
-
-
-    localStorage.setItem(
-
-        "dokuoya_ranking",
-
-        JSON.stringify(ranking)
-
-    );
-
 }
-
 
 
 /*
@@ -990,7 +953,6 @@ async function saveRanking() {
 自分の順位
 ==================================================
 */
-
 
 async function getPlayerRank() {
 
@@ -1002,22 +964,10 @@ async function getPlayerRank() {
             player.score === totalScore
     );
 
-    return index >= 0 ? index + 1 : ranking.length + 1;
+    return index >= 0
+        ? index + 1
+        : ranking.length + 1;
 }
-
-
-    return ranking.length;
-
-}
-
-
-
-/*
-==================================================
-ランキング表示
-==================================================
-*/
-
 
 async function showRanking() {
 
