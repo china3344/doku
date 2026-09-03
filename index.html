@@ -715,7 +715,18 @@ function startGame() {
     const input =
         document.getElementById("nameInput");
 
-    
+    const name =
+        input.value.trim();
+
+
+    if (name === "") {
+
+        alert("名前を入力してください。");
+
+        return;
+
+    }
+
 
     playerName = name;
 
@@ -726,13 +737,13 @@ function startGame() {
 
     // BGM開始
     bgm.currentTime = 0;
+
     bgm.play().catch(error => {
         console.log("BGM再生エラー:", error);
     });
 
 
     changeScreen("questionScreen");
-
 
     showQuestion();
 
